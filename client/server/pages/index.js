@@ -56,6 +56,7 @@ import { getLanguage, filterLanguageRevisions } from 'lib/i18n-utils';
 import { isWooOAuth2Client } from 'lib/oauth2-clients';
 import { GUTENBOARDING_SECTION_DEFINITION } from 'landing/gutenboarding/section';
 import { JETPACK_CLOUD_SECTION_DEFINITION } from 'landing/jetpack-cloud/section';
+import { READER_SECTION_DEFINITIONS } from 'reader';
 
 const debug = debugFactory( 'calypso:pages' );
 
@@ -859,6 +860,15 @@ module.exports = function() {
 	// Set up login routing.
 	handleSectionPath( LOGIN_SECTION_DEFINITION, '/log-in', 'entry-login' );
 	loginRouter( serverRouter( app, setUpRoute, null ) );
+
+	// Set up reader routing.
+	READER_SECTION_DEFINITIONS.filter(
+		section => ! section.envId || section.envId.indexOf( config( 'env_id' ) ) > -1
+	).forEach( section => {
+		section.paths.forEach( sectionPath =>
+			handleSectionPath( section, sectionPath, 'entry-reader' )
+		);
+	} );
 
 	handleSectionPath( GUTENBOARDING_SECTION_DEFINITION, '/gutenboarding', 'entry-gutenboarding' );
 
