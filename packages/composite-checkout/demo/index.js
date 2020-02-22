@@ -21,6 +21,8 @@ import {
 	getDefaultOrderSummaryStep,
 	getDefaultPaymentMethodStep,
 	useIsStepActive,
+	useSelect,
+	useDispatch,
 } from '../src/public-api';
 
 const stripeKey = 'pk_test_zIh4nRbVgmaetTZqoG4XKxWT';
@@ -85,7 +87,7 @@ async function makePayPalExpressRequest( data ) {
 }
 
 const registry = createRegistry();
-const { registerStore, select, dispatch, subscribe } = registry;
+const { registerStore, select } = registry;
 
 registerStore( 'demo', {
 	actions: {
@@ -157,15 +159,6 @@ export function isApplePayAvailable() {
 	return isApplePayAvailable.canMakePayments;
 }
 
-const handleEvent = setItems => () => {
-	const cardholderName = select( 'stripe' ).getCardholderName();
-	if ( cardholderName === 'admin' ) {
-		setItems( items =>
-			items.map( item => ( { ...item, amount: { ...item.amount, value: 0, displayValue: '0' } } ) )
-		);
-	}
-};
-
 const getTotal = items => {
 	const lineItemTotal = items.reduce( ( sum, item ) => sum + item.amount.value, 0 );
 	const currency = items.reduce( ( lastCurrency, item ) => item.amount.currency, 'USD' );
@@ -216,8 +209,9 @@ const Form = styled.div`
 `;
 
 function ContactForm( { summary } ) {
-	const country = select( 'demo' ).getCountry();
-	const onChangeCountry = event => dispatch( 'demo' ).setCountry( event.target.value );
+	const country = useSelect( storeSelect => storeSelect( 'demo' )?.getCountry() ?? '' );
+	const { setCountry } = useDispatch( 'demo' );
+	const onChangeCountry = event => setCountry( event.target.value );
 
 	if ( summary ) {
 		return (
@@ -245,18 +239,11 @@ const contactFormStep = {
 	titleContent: <ContactFormTitle />,
 	activeStepContent: <ContactForm />,
 	completeStepContent: <ContactForm summary />,
-	isCompleteCallback: () => {
-		const country = select( 'demo' ).getCountry();
-		return country?.length > 0;
-	},
 };
 
 // This is the parent component which would be included on a host page
 function MyCheckout() {
-	const [ items, setItems ] = useState( initialItems );
-	useEffect( () => {
-		subscribe( handleEvent( setItems ) );
-	}, [] );
+	const [ items ] = useState( initialItems );
 	const total = useMemo( () => getTotal( items ), [ items ] );
 
 	// This simulates loading the data
@@ -279,45 +266,55 @@ function MyCheckout() {
 			isLoading={ isLoading }
 			paymentMethods={ [ applePayMethod, stripeMethod, paypalMethod ].filter( Boolean ) }
 		>
-			<Checkout>
-				<CheckoutStepBody
-					activeStepContent={ orderSummaryStep.activeStepContent }
-					completeStepContent={ orderSummaryStep.completeStepContent }
-					titleContent={ orderSummaryStep.titleContent }
-					errorMessage={ 'There was an error with this step.' }
-					isStepActive={ false }
-					isStepComplete={ true }
-					stepNumber={ 1 }
-					totalSteps={ 1 }
-					stepId={ 'order-summary' }
-				/>
-				<CheckoutSteps>
-					<CheckoutStep
-						stepId="payment-method-step"
-						isCompleteCallback={ () =>
-							new Promise( resolve => setTimeout( () => resolve( true ), 1500 ) )
-						}
-						activeStepContent={ paymentMethodStep.activeStepContent }
-						completeStepContent={ paymentMethodStep.completeStepContent }
-						titleContent={ paymentMethodStep.titleContent }
-					/>
-					<CheckoutStep
-						stepId={ contactFormStep.id }
-						isCompleteCallback={ contactFormStep.isCompleteCallback }
-						activeStepContent={ contactFormStep.activeStepContent }
-						completeStepContent={ contactFormStep.completeStepContent }
-						titleContent={ contactFormStep.titleContent }
-					/>
-					<CheckoutStep
-						stepId="review-order-step"
-						isCompleteCallback={ () => true }
-						activeStepContent={ reviewOrderStep.activeStepContent }
-						completeStepContent={ reviewOrderStep.completeStepContent }
-						titleContent={ reviewOrderStep.titleContent }
-					/>
-				</CheckoutSteps>
-			</Checkout>
+			<MyCheckoutBody />
 		</CheckoutProvider>
+	);
+}
+
+function MyCheckoutBody() {
+	const country = useSelect( storeSelect => storeSelect( 'demo' )?.getCountry() ?? '' );
+
+	return (
+		<Checkout>
+			<CheckoutStepBody
+				activeStepContent={ orderSummaryStep.activeStepContent }
+				completeStepContent={ orderSummaryStep.completeStepContent }
+				titleContent={ orderSummaryStep.titleContent }
+				errorMessage={ 'There was an error with this step.' }
+				isStepActive={ false }
+				isStepComplete={ true }
+				stepNumber={ 1 }
+				totalSteps={ 1 }
+				stepId={ 'order-summary' }
+			/>
+			<CheckoutSteps>
+				<CheckoutStep
+					stepId="payment-method-step"
+					isCompleteCallback={ () =>
+						new Promise( resolve => setTimeout( () => resolve( true ), 1500 ) )
+					}
+					activeStepContent={ paymentMethodStep.activeStepContent }
+					completeStepContent={ paymentMethodStep.completeStepContent }
+					titleContent={ paymentMethodStep.titleContent }
+				/>
+				<CheckoutStep
+					stepId={ contactFormStep.id }
+					isCompleteCallback={ () => {
+						return country.length > 0;
+					} }
+					activeStepContent={ contactFormStep.activeStepContent }
+					completeStepContent={ contactFormStep.completeStepContent }
+					titleContent={ contactFormStep.titleContent }
+				/>
+				<CheckoutStep
+					stepId="review-order-step"
+					isCompleteCallback={ () => true }
+					activeStepContent={ reviewOrderStep.activeStepContent }
+					completeStepContent={ reviewOrderStep.completeStepContent }
+					titleContent={ reviewOrderStep.titleContent }
+				/>
+			</CheckoutSteps>
+		</Checkout>
 	);
 }
 
