@@ -9,6 +9,8 @@ import styled from '@emotion/styled';
 import ReactDOM from 'react-dom';
 import {
 	Checkout,
+	CheckoutSteps,
+	CheckoutStep,
 	CheckoutProvider,
 	createApplePayMethod,
 	createPayPalMethod,
@@ -17,6 +19,7 @@ import {
 	getDefaultOrderReviewStep,
 	getDefaultOrderSummaryStep,
 	getDefaultPaymentMethodStep,
+	usePaymentMethodId,
 	useIsStepActive,
 	usePaymentData,
 } from '../src/public-api';
@@ -256,6 +259,11 @@ function AdditionalFields() {
 	);
 }
 
+const PaymentMethodStep = () => {
+	const { activeStepContent } = getDefaultPaymentMethodStep();
+	return <div>{ activeStepContent }</div>;
+};
+
 const steps = [
 	getDefaultOrderSummaryStep(),
 	{
@@ -302,6 +310,7 @@ function MyCheckout() {
 		subscribe( handleEvent( setItems ) );
 	}, [] );
 	const total = useMemo( () => getTotal( items ), [ items ] );
+	const [ activePaymentMethod ] = usePaymentMethodId();
 
 	// This simulates loading the data
 	const [ isLoading, setIsLoading ] = useState( true );
@@ -323,7 +332,17 @@ function MyCheckout() {
 			isLoading={ isLoading }
 			paymentMethods={ [ applePayMethod, stripeMethod, paypalMethod ].filter( Boolean ) }
 		>
-			<Checkout steps={ steps } />
+			<Checkout>
+				<CheckoutSteps>
+					<CheckoutStep
+						title="Pick a payment method"
+						stepId="payment-method-step"
+						isComplete={ () => !! activePaymentMethod }
+					>
+						<PaymentMethodStep />
+					</CheckoutStep>
+				</CheckoutSteps>
+			</Checkout>
 		</CheckoutProvider>
 	);
 }
