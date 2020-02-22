@@ -259,6 +259,7 @@ function AdditionalFields() {
 }
 
 const paymentMethodStep = getDefaultPaymentMethodStep();
+const reviewOrderStep = getDefaultOrderReviewStep();
 
 const steps = [
 	getDefaultOrderSummaryStep(),
@@ -335,6 +336,13 @@ function MyCheckout() {
 						activeStepContent={ paymentMethodStep.activeStepContent }
 						completeStepContent={ paymentMethodStep.completeStepContent }
 						titleContent={ paymentMethodStep.titleContent }
+					/>
+					<CheckoutStep
+						stepId="review-order-step"
+						isCompleteCallback={ () => true }
+						activeStepContent={ reviewOrderStep.activeStepContent }
+						completeStepContent={ reviewOrderStep.completeStepContent }
+						titleContent={ reviewOrderStep.titleContent }
 					/>
 				</CheckoutSteps>
 			</Checkout>
