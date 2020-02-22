@@ -19,7 +19,6 @@ import {
 	getDefaultOrderReviewStep,
 	getDefaultOrderSummaryStep,
 	getDefaultPaymentMethodStep,
-	usePaymentMethodId,
 	useIsStepActive,
 	usePaymentData,
 } from '../src/public-api';
@@ -310,7 +309,6 @@ function MyCheckout() {
 		subscribe( handleEvent( setItems ) );
 	}, [] );
 	const total = useMemo( () => getTotal( items ), [ items ] );
-	const [ activePaymentMethod ] = usePaymentMethodId();
 
 	// This simulates loading the data
 	const [ isLoading, setIsLoading ] = useState( true );
@@ -337,7 +335,7 @@ function MyCheckout() {
 					<CheckoutStep
 						title="Pick a payment method"
 						stepId="payment-method-step"
-						isComplete={ () => !! activePaymentMethod }
+						isComplete={ () => true }
 					>
 						<PaymentMethodStep />
 					</CheckoutStep>
