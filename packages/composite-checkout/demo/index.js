@@ -23,6 +23,7 @@ import {
 	useIsStepActive,
 	useSelect,
 	useDispatch,
+	useMessages,
 } from '../src/public-api';
 
 const stripeKey = 'pk_test_zIh4nRbVgmaetTZqoG4XKxWT';
@@ -273,6 +274,7 @@ function MyCheckout() {
 
 function MyCheckoutBody() {
 	const country = useSelect( storeSelect => storeSelect( 'demo' )?.getCountry() ?? '' );
+	const { showErrorMessage: showError } = useMessages();
 
 	return (
 		<Checkout>
@@ -300,7 +302,16 @@ function MyCheckoutBody() {
 				<CheckoutStep
 					stepId={ contactFormStep.id }
 					isCompleteCallback={ () =>
-						new Promise( resolve => setTimeout( () => resolve( country.length > 0 ), 1500 ) )
+						new Promise( resolve =>
+							setTimeout( () => {
+								if ( country.length === 0 ) {
+									showError( 'The country field is required' );
+									resolve( false );
+									return;
+								}
+								resolve( true );
+							}, 1500 )
+						)
 					}
 					activeStepContent={ contactFormStep.activeStepContent }
 					completeStepContent={ contactFormStep.completeStepContent }
