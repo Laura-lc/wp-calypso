@@ -24,6 +24,7 @@ import {
 	useSelect,
 	useDispatch,
 	useMessages,
+	useFormStatus,
 } from '../src/public-api';
 
 const stripeKey = 'pk_test_zIh4nRbVgmaetTZqoG4XKxWT';
@@ -213,6 +214,7 @@ function ContactForm( { summary } ) {
 	const country = useSelect( storeSelect => storeSelect( 'demo' )?.getCountry() ?? '' );
 	const { setCountry } = useDispatch( 'demo' );
 	const onChangeCountry = event => setCountry( event.target.value );
+	const { formStatus } = useFormStatus();
 
 	if ( summary ) {
 		return (
@@ -226,7 +228,13 @@ function ContactForm( { summary } ) {
 	return (
 		<Form>
 			<Label htmlFor="country">Country</Label>
-			<Input id="country" type="text" value={ country } onChange={ onChangeCountry } />
+			<Input
+				id="country"
+				type="text"
+				value={ country }
+				onChange={ onChangeCountry }
+				disabled={ formStatus !== 'ready' }
+			/>
 		</Form>
 	);
 }
