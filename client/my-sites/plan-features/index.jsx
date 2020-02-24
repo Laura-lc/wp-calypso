@@ -155,6 +155,18 @@ export class PlanFeatures extends Component {
 			? plans.indexOf( selectedPlan )
 			: findIndex( planProperties, { popular: true } );
 
+		const a = { display: 'flex', 'justify-content': 'center', color: '#fff', 'font-size': '20px' };
+		const b = { display: 'flex', 'flex-direction': 'column', width: '35%' };
+		const c = { 'border-left': '1px solid #fff', 'margin-left': '20px', 'padding-left': '20px' };
+		const d = {
+			background:
+				"url('https://s1.wp.com/wp-content/themes/h4/landing/marketing/pages/_common/components/vip-pitch/media/vip-brands.png')",
+			'background-repeat': 'no-repeat',
+			'background-size': '340px',
+			height: '35px',
+			'margin-left': '40px',
+			'margin-top': '40px',
+		};
 		return (
 			<div className={ planWrapperClasses }>
 				<QueryActivePromotions />
@@ -183,6 +195,17 @@ export class PlanFeatures extends Component {
 								</tbody>
 							</table>
 						</PlanFeaturesScroller>
+
+						<div style={ a }>
+							<div>You're in good hands</div>
+							<div style={ b }>
+								<div style={ c }>
+									Did you know that WordPress powers 35% of the entire internet? WordPress.com is
+									the best WordPress solution out there, as trusted by:
+								</div>
+								<div style={ d }></div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -348,7 +371,7 @@ export class PlanFeatures extends Component {
 		return ReactDOM.createPortal(
 			<Notice className="plan-features__notice" showDismiss={ false } status="is-info">
 				{ translate(
-					"This plan was purchased by a different WordPress.com account. To manage this plan, log in to that account or contact the account owner."
+					'This plan was purchased by a different WordPress.com account. To manage this plan, log in to that account or contact the account owner.'
 				) }
 			</Notice>,
 			bannerContainer
