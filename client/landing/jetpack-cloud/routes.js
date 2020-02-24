@@ -6,6 +6,7 @@ import page from 'page';
 /**
  * Internal dependencies
  */
+import config from 'config';
 import { normalize } from 'lib/route';
 import { siteSelection } from 'my-sites/controller';
 import { clientRender, makeLayout, setupSidebar } from './controller';
@@ -23,19 +24,87 @@ const router = () => {
 
 	page( '/', setupSidebar, jetpackCloudDashboard, makeLayout, clientRender );
 
-	page( '/backups', siteSelection, setupSidebar, jetpackCloudBackups, makeLayout, clientRender );
-	page( '/backups/:site', siteSelection, setupSidebar, jetpackCloudBackups, makeLayout, clientRender );
-	page( '/backups/:site/detail/:backupId', siteSelection, setupSidebar, jetpackCloudBackupDetail, makeLayout, clientRender );
-	page( '/backups/:site/download/:downloadId', siteSelection, setupSidebar, jetpackCloudBackupDownload, makeLayout, clientRender );
-	page( '/backups/:site/restore', siteSelection, setupSidebar, jetpackCloudBackupRestore, makeLayout, clientRender );
-	page( '/backups/:site/restore/:restoreId', siteSelection, setupSidebar, jetpackCloudBackupRestore, makeLayout, clientRender );
+	if ( config.isEnabled( 'jetpack-cloud/backups' ) ) {
+		page( '/backups', siteSelection, setupSidebar, jetpackCloudBackups, makeLayout, clientRender );
+		page(
+			'/backups/:site',
+			siteSelection,
+			setupSidebar,
+			jetpackCloudBackups,
+			makeLayout,
+			clientRender
+		);
+		page(
+			'/backups/:site/detail/:backupId',
+			siteSelection,
+			setupSidebar,
+			jetpackCloudBackupDetail,
+			makeLayout,
+			clientRender
+		);
+		page(
+			'/backups/:site/download/:downloadId',
+			siteSelection,
+			setupSidebar,
+			jetpackCloudBackupDownload,
+			makeLayout,
+			clientRender
+		);
 
-	page( '/scan', siteSelection, setupSidebar, jetpackCloudScan, makeLayout, clientRender );
-	page( '/scan/:site', siteSelection, setupSidebar, jetpackCloudScan, makeLayout, clientRender );
-	page( '/scan/:site/history', siteSelection, setupSidebar, jetpackCloudScanHistory, makeLayout, clientRender );
+		if ( config.isEnabled( 'jetpack-cloud/backups-restore' ) ) {
+			page(
+				'/backups/:site/restore',
+				siteSelection,
+				setupSidebar,
+				jetpackCloudBackupRestore,
+				makeLayout,
+				clientRender
+			);
+			page(
+				'/backups/:site/restore/:restoreId',
+				siteSelection,
+				setupSidebar,
+				jetpackCloudBackupRestore,
+				makeLayout,
+				clientRender
+			);
+		}
+	}
 
-	page( '/settings', siteSelection, setupSidebar, jetpackCloudSettings, makeLayout, clientRender );
-	page( '/settings/:site', siteSelection, setupSidebar, jetpackCloudSettings, makeLayout, clientRender );
+	if ( config.isEnabled( 'jetpack-cloud/scan' ) ) {
+		page( '/scan', siteSelection, setupSidebar, jetpackCloudScan, makeLayout, clientRender );
+		page( '/scan/:site', siteSelection, setupSidebar, jetpackCloudScan, makeLayout, clientRender );
+
+		if ( config.isEnabled( 'jetpack-cloud/scan-history' ) ) {
+			page(
+				'/scan/:site/history',
+				siteSelection,
+				setupSidebar,
+				jetpackCloudScanHistory,
+				makeLayout,
+				clientRender
+			);
+		}
+	}
+
+	if ( config.isEnabled( 'jetpack-cloud/settings' ) ) {
+		page(
+			'/settings',
+			siteSelection,
+			setupSidebar,
+			jetpackCloudSettings,
+			makeLayout,
+			clientRender
+		);
+		page(
+			'/settings/:site',
+			siteSelection,
+			setupSidebar,
+			jetpackCloudSettings,
+			makeLayout,
+			clientRender
+		);
+	}
 };
 
 export default router;
