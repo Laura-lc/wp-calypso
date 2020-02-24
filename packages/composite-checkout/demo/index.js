@@ -25,6 +25,7 @@ import {
 	useDispatch,
 	useMessages,
 	useFormStatus,
+	usePaymentMethod,
 } from '../src/public-api';
 
 const stripeKey = 'pk_test_zIh4nRbVgmaetTZqoG4XKxWT';
@@ -283,6 +284,7 @@ function MyCheckout() {
 function MyCheckoutBody() {
 	const country = useSelect( storeSelect => storeSelect( 'demo' )?.getCountry() ?? '' );
 	const { showErrorMessage: showError } = useMessages();
+	const activePaymentMethod = usePaymentMethod();
 
 	return (
 		<Checkout>
@@ -301,7 +303,7 @@ function MyCheckoutBody() {
 				<CheckoutStep
 					stepId="payment-method-step"
 					isCompleteCallback={ () =>
-						new Promise( resolve => setTimeout( () => resolve( true ), 500 ) )
+						paymentMethodStep.isCompleteCallback( { activePaymentMethod } )
 					}
 					activeStepContent={ paymentMethodStep.activeStepContent }
 					completeStepContent={ paymentMethodStep.completeStepContent }
