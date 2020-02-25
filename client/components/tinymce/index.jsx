@@ -194,7 +194,6 @@ export default class TinyMCE extends React.Component {
 		onUndo: PropTypes.func,
 		onTextEditorChange: PropTypes.func,
 		isGutenbergClassicBlock: PropTypes.bool,
-		isVipSite: PropTypes.bool,
 	};
 
 	static defaultProps = {
@@ -229,7 +228,7 @@ export default class TinyMCE extends React.Component {
 	}
 
 	componentDidMount() {
-		const { isGutenbergClassicBlock, isVipSite } = this.props;
+		const { isGutenbergClassicBlock } = this.props;
 		this.mounted = true;
 
 		const setup = editor => {
@@ -265,7 +264,7 @@ export default class TinyMCE extends React.Component {
 
 		const ltrButton = isRtl ? 'ltr,' : '';
 		const gutenbergClassName = isGutenbergClassicBlock ? ' is-gutenberg' : '';
-		const spellchecker = isVipSite ? ',spellchecker' : '';
+		const spellchecker = ',spellchecker';
 
 		tinymce.init( {
 			selector: '#' + this._id,
