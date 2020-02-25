@@ -102,6 +102,7 @@ export class PlansStep extends Component {
 	isEligibleForPlanStepTest() {
 		return (
 			config.isEnabled( 'plans-step-copy-updates' ) &&
+			! this.props.isLaunchPage &&
 			'variantCopyUpdates' === abtest( 'planStepCopyUpdates' )
 		);
 	}
